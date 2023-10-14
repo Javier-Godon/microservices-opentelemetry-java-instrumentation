@@ -1,0 +1,43 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: erp-catalog-configmap
+data:
+  application.yaml: |-
+    server:
+    port: 9014
+    spring:
+      datasource:
+        url: jdbc:postgresql://blue-postgres.postgres/blue-postgres
+        username: postgres
+        password: postgres
+        driverClassName: org.postgresql.Driver
+      jpa:
+        database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+        show_sql: true
+        properties:
+          hibernate:
+            dialect: org.hibernate.dialect.PostgreSQL9Dialect
+            show_sql: true
+            format_sql: true
+            temp:
+              use_jdbc_metadata_defaults: false
+      cloud:
+        stream:
+          bindings:
+            eidproof-requested-in:
+              destination: eidproof-requested
+            eidproof-requested-out:
+              destination: eidproof-requested
+
+      kafka:
+        boot:
+          server: blue-cluster-kafka-bootstrap 
+
+      servlet:
+        multipart:
+          max-file-size: 2MB
+          max-request-size: 10MB
+
+    springdoc:
+      swagger-ui: path:/swagger-ui.html

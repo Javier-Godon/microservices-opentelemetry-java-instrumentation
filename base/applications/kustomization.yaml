@@ -1,0 +1,42 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- erp
+- video-streaming
+
+# commonAnnotations:
+#   linkerd.io/inject: enabled
+
+# patches:
+# - target:
+#     kind: Deployment
+#   patch: |-
+#     - op: add
+#       path: /metadata/annotations/"linkerd.io/inject"
+#       value: enabled
+    # - op: add
+    #   path: /spec/template/metadata/annotations
+    #   value: instrumentation.opentelemetry.io/inject-java: "true"  
+
+
+#     - op: remove 
+#       path: /spec/template/spec/containers/0/env/0/valueFrom
+# - target:
+#     kind: ClusterRoleBinding
+#   patch: |-
+#     - op: replace
+#       path: /subjects/0/namespace
+#       value: kafka
+# - target:
+#     kind: RoleBinding
+#   patch: |-
+#     - op: replace
+#       path: /subjects/0/namespace
+#       value: kafka   
+
+
+
+
+    
+   

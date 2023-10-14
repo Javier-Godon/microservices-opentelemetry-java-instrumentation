@@ -1,0 +1,57 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: grpc-kafka-stream-video-server-configmap
+data:
+  application.yaml: |-
+    server:
+      port: 8189
+    spring:
+      application:
+        name: StreamVideoServer
+      data:
+        mongodb:
+          #      authentication-database: admin
+          database: blue-mongodb
+          #      uri: mongodb+srv://user:admin@localhost:8000/blue-mongodb
+          #      uri: mongodb://user:admin@localhost:8000/blue-mongodb
+          # uri: mongodb://user:admin@blue-mongodb-0.blue-mongodb-svc.mongodb.svc.cluster.local:40333,blue-mongodb-1.blue-mongodb-svc.mongodb.svc.cluster.local:40333,blue-mongodb-2.blue-mongodb-svc.mongodb.svc.cluster.local:40333/videos?replicaSet=blue-mongodb&ssl=false
+          uri: mongodb://admin:admin@blue-mongo-db.mongodb-single/admin?readPreference=primaryPreferred
+        
+    management:
+      tracing:
+        sampling:
+          probability: 1.0
+      endpoints:
+        web:
+          exposure:
+            include: "*"
+            exclude: "env,beans"
+      otlp:
+        metrics:
+          export:
+            url: http://otel-collector-collector.opentelemetry:4318/v1/metrics
+            step: 10s
+    logging:
+      level:
+        es.bluesolution: TRACE 
+        org.springframework: INFO                
+
+
+    # otel:
+    #   exporter:
+    #     otlp:
+    #       endpoint: otel-collector-collector.opentelemetry:4317
+    #       traces:
+    #         endpoint: otel-collector-collector.opentelemetry:4317
+    #       metrics:
+    #         endpoint: otel-collector-collector.opentelemetry:4317
+    #   traces:
+    #     sampler:
+    #       probability: 1.0
+
+    # prometheus:
+    #   metrics:
+    #       export:
+    #         enabled: true
+            

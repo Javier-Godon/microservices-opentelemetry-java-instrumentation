@@ -1,0 +1,61 @@
+# https://help.sonatype.com/repomanager3/installation-and-upgrades/configuring-the-runtime-environment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc-kafka-stream-video-server       
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grpc-kafka-stream-video-server
+  template:
+    metadata:
+      labels:
+        app: grpc-kafka-stream-video-server
+        # for prometheus
+        app.kubernetes.io/component: grpc-kafka-stream-video-server
+        app.kubernetes.io/instance: microservice
+        app.kubernetes.io/name: grpc-kafka-stream-video-server
+      annotations: 
+        # instrumentation.opentelemetry.io/inject-java: "true"  # default
+        instrumentation.opentelemetry.io/inject-java: "grpc-kafka-stream-video-server-otel-instrumentation"
+        # linkerd.io/inject: enabled
+        # config.linkerd.io/trace-collector: collector.linkerd-jaeger:14250       
+    spec:
+      containers:
+        - name: grpc-kafka-stream-video-server          
+          image: javiergodon/grpc-kafka-stream-video-server@sha256:da50c2a50ac8133428108c47a9d5e255ceee25b8c825366bbbfc4b069c5c717a
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              memory: "4Gi"
+              cpu: "1000m"
+            requests:
+              memory: "2Gi"
+              cpu: "500m" 
+          volumeMounts:
+          - name: config
+            mountPath: "/config"
+            readOnly: true            
+      volumes:
+        - name: config
+          configMap:
+            name: grpc-kafka-stream-video-server-configmap                 
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: grpc-kafka-stream-video-server-service  
+spec:
+  selector: 
+    app: grpc-kafka-stream-video-server
+  type: LoadBalancer  
+  ports:
+    - name: grpc-kafka-server 
+      port: 8189
+      nodePort: 31001
+
+
+  

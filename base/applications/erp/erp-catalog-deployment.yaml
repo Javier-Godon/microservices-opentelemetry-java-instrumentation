@@ -1,0 +1,53 @@
+# https://help.sonatype.com/repomanager3/installation-and-upgrades/configuring-the-runtime-environment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: erp-catalog 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: erp-catalog
+  template:
+    metadata:
+      labels:
+        app: erp-catalog
+      annotations: 
+        instrumentation.opentelemetry.io/inject-java: "erp-catalog-otel-instrumentation"
+        # linkerd.io/inject: enabled    
+    spec:
+      containers:
+        - name: erp-catalog          
+          image: javiergodon/erp-catalog:v0.0.1-SNAPSHOT
+          resources:
+            limits:
+              memory: "4Gi"
+              cpu: "1000m"
+            requests:
+              memory: "2Gi"
+              cpu: "500m"
+          volumeMounts:
+          - name: config
+            mountPath: "/config"
+            readOnly: true     
+      volumes:
+        - name: config
+          configMap:
+            name: erp-catalog-configmap                 
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: erp-catalog-service  
+spec:
+  selector: 
+    app: erp-catalog
+  type: ClusterIP  
+  ports:
+    - port: 9014
+      targetPort: 9014
+
+
+  
